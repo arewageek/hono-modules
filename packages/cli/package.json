@@ -1,0 +1,27 @@
+{
+  "name": "@hono-modules/cli",
+  "version": "0.1.0",
+  "description": "CLI for hono-modules",
+  "bin": {
+    "hm": "./dist/index.js",
+    "hono-modules": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "bun build ./src/index.ts --outdir ./dist --target node",
+    "dev": "bun build ./src/index.ts --outdir ./dist --target node --watch",
+    "lint": "eslint .",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "cac": "^6.7.14",
+    "picocolors": "^1.1.0",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "*",
+    "@repo/eslint-config": "*",
+    "@types/node": "^22.0.0",
+    "@types/prompts": "^2.4.9",
+    "typescript": "^5.9.2"
+  }
+}
