@@ -1,0 +1,24 @@
+{
+  "name": "hono-modules",
+  "version": "0.1.0",
+  "description": "A lightweight module and feature manager for HonoJS applications",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "bun build ./src/index.ts --outdir ./dist --target node",
+    "dev": "bun build ./src/index.ts --outdir ./dist --target node --watch",
+    "lint": "eslint .",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {},
+  "peerDependencies": {
+    "hono": "^4.0.0"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "*",
+    "@repo/eslint-config": "*",
+    "@types/node": "^22.0.0",
+    "hono": "^4.0.0",
+    "typescript": "^5.9.2"
+  }
+}
