@@ -1,159 +1,135 @@
-# Turborepo starter
+# hono-modules
 
-This Turborepo starter is maintained by the Turborepo core team.
+A lightweight module and feature manager for HonoJS applications.
 
-## Using this example
+`hono-modules` provides a structured, scalable approach to developing Hono backends. By enforcing a feature-driven (modular) architecture, it helps maintain clean codebases in growing applications without the overhead of heavy frameworks.
 
-Run the following command:
+## Core Architecture
 
-```sh
-npx create-turbo@latest
+1. **Standardized Feature-First Directory Structure**: Organizes application logic by domain rather than technical role. The root directory name (e.g., `modules`, `features`, `api`) is fully customizable.
+2. **Explicit Module Registry**: Centralizes route aggregation to keep the main application entry point clean. Utilizes explicit array registration to maximize startup performance and avoid unpredictable filesystem-based auto-discovery.
+3. **CLI-Driven Configuration**: The CLI automatically handles the wiring and registration of new modules. Developers only need to import the registry into their application entry point once.
+
+---
+
+## Installation
+
+Install the runtime library via your preferred package manager:
+
+```bash
+npm install hono-modules
+```
+```bash
+yarn add hono-modules
+```
+```bash
+bun add hono-modules
 ```
 
-## What's inside?
+---
 
-This Turborepo includes the following packages/apps:
+## Directory Structure
 
-### Apps and Packages
+`hono-modules` enforces concise naming conventions within feature directories to minimize redundancy. The CLI configures the structure automatically. A standard application structure is as follows:
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+```text
+src/
+├── app.ts                  # Main Hono application instantiation
+├── index.ts                # Server entry point
+├── core/                   # Global middlewares, utilities, and error handlers
+└── modules/                # Customizable folder name (e.g., 'features', 'api')
+    ├── index.ts            # Central module registry (Auto-managed by CLI)
+    ├── users/              # Example "users" feature module
+    │   ├── module.ts       # Module definition and configuration
+    │   ├── routes.ts       # Hono route definitions
+    │   ├── service.ts      # Business logic implementation
+    │   └── types.ts        # Type definitions and interfaces
+    └── auth/               # Example "auth" feature module
+        └── ...
 ```
 
-Without global `turbo`, use your package manager:
+---
 
-```sh
-cd my-turborepo
-npx turbo build
-bun dlx turbo build
-bun exec turbo build
+## Usage Guide
+
+### 1. Initialization
+
+Initialize the library in your project root. The CLI will prompt you to define your preferred directory name (e.g., `src/modules` or `src/features`) and will generate a configuration file (`hm.config.json`) alongside the central registry.
+
+```bash
+hm init
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+### 2. Generate a Module
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+Use the CLI to scaffold a new feature. The CLI will generate the necessary files and **automatically register the module** in your central registry file. Manual configuration is not required.
 
-```sh
-turbo build --filter=docs
+```bash
+hm generate module users
 ```
 
-Without global `turbo`:
+The generated `module.ts` supports programmatic feature flagging via the `enabled` property.
 
-```sh
-npx turbo build --filter=docs
-bun exec turbo build --filter=docs
-bun exec turbo build --filter=docs
+```typescript
+// src/modules/users/module.ts
+import { createModule } from 'hono-modules';
+import { userRoutes } from './routes';
+
+export const usersModule = createModule({
+  name: 'users',
+  basePath: '/users', // Automatically prefixes all routes in this module
+  enabled: true,      // Set to false to disable this API domain
+  routes: userRoutes,
+});
 ```
 
-### Develop
+### 3. Apply to the Application
 
-To develop all apps and packages, run the following command:
+The only manual wiring required is to import the registry into your main application initialization file (e.g., `src/app.ts`) and apply it to the Hono instance.
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+```typescript
+import { Hono } from 'hono';
+import { registry } from './modules'; // Path corresponds to your configured directory
 
-```sh
-cd my-turborepo
-turbo dev
+const app = new Hono();
+
+registry.applyTo(app);
+
+export default app;
 ```
 
-Without global `turbo`, use your package manager:
+---
 
-```sh
-cd my-turborepo
-npx turbo dev
-bun exec turbo dev
-bun exec turbo dev
-```
+## CLI Reference
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+The `@hono-modules/cli` package provides commands for code generation and configuration management. The executable is accessible via `hm` or `hono-modules`.
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+### `hm init`
+Initializes the `hono-modules` structure in an existing Hono application. Prompts for the preferred directory name, generates `hm.config.json`, and scaffolds the central registry.
 
-```sh
-turbo dev --filter=web
-```
+### `hm generate module <name>` (Alias: `hm g m <name>`)
+Scaffolds a new feature module directory. Generates the base files (`module.ts`, `routes.ts`, `service.ts`, `types.ts`) and automatically updates the central registry to include the new module.
 
-Without global `turbo`:
+### `hm generate route <module> <name>` (Alias: `hm g r <module> <name>`)
+Appends a new route configuration to an existing module's route file.
 
-```sh
-npx turbo dev --filter=web
-bun exec turbo dev --filter=web
-bun exec turbo dev --filter=web
-```
+### `hm generate service <module> <name>` (Alias: `hm g s <module> <name>`)
+Generates an additional service file for a specific module to handle extended domain logic.
 
-### Remote Caching
+### `hm enable <module>` / `hm disable <module>`
+Programmatically updates the `enabled` boolean property in the target module's `module.ts` configuration file.
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+---
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+## Design Principles
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+*   **Traceability**: Configurations and routings are explicit. The CLI writes standard, readable code, and the runtime executes explicit wiring without decorators or hidden filesystem dependencies.
+*   **Automation over Magic**: The CLI automates the boilerplate and registry wiring, ensuring developers do not have to write repetitive configuration code, while keeping the output 100% transparent.
+*   **Serverless Compatibility**: Designed for environments like Cloudflare Workers, Bun, Deno, and Node.js. The absence of filesystem auto-discovery ensures optimal cold-startup performance.
+*   **Simplicity**: Enforces maintainable architectural patterns without complex abstractions.
+*   **Type Safety**: Written entirely in TypeScript, leveraging generic inference to maintain end-to-end type safety.
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+---
 
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-bun exec turbo login
-bun exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-bun exec turbo link
-bun exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+## License
+MIT

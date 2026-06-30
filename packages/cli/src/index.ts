@@ -1,40 +1,46 @@
 #!/usr/bin/env node
 import cac from 'cac';
-import * as pc from 'picocolors';
+import pc from 'picocolors';
+import { initCommand } from './commands/init';
+import { generateModuleCommand } from './commands/generate';
 
 const cli = cac('hm');
 
 cli
   .command('init', 'Initialize hono-modules in your project')
-  .action(() => {
-    console.log(pc.green('Initializing hono-modules...'));
-    // TODO: Implement init logic
+  .action(async () => {
+    try {
+      await initCommand();
+    } catch (err: any) {
+      console.error(pc.red(`Initialization failed: ${err.message}`));
+    }
   });
 
 cli
   .command('generate <type> <name>', 'Generate a module, route, or service (alias: g)')
   .alias('g')
-  .action((type: string, name: string) => {
+  .action(async (type: string, name: string) => {
     if (type === 'module' || type === 'm') {
-      console.log(pc.green(`Generating module ${name}...`));
-      // TODO: Implement module generation logic
+      try {
+        await generateModuleCommand(name);
+      } catch (err: any) {
+        console.error(pc.red(`Generation failed: ${err.message}`));
+      }
     } else {
-      console.log(pc.red(`Unknown generation type: ${type}`));
+      console.error(pc.red(`Unknown generation type: ${type}`));
     }
   });
 
 cli
   .command('enable <module>', 'Enable a module')
   .action((module: string) => {
-    console.log(pc.green(`Enabling module ${module}...`));
-    // TODO: Implement toggle logic
+    console.log(pc.green(`Enabling module ${module}... (Not yet implemented)`));
   });
 
 cli
   .command('disable <module>', 'Disable a module')
   .action((module: string) => {
-    console.log(pc.yellow(`Disabling module ${module}...`));
-    // TODO: Implement toggle logic
+    console.log(pc.yellow(`Disabling module ${module}... (Not yet implemented)`));
   });
 
 cli.help();
