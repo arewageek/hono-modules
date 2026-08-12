@@ -31,13 +31,11 @@ export async function initCommand() {
   await fs.mkdir(dirPath, { recursive: true });
 
   // Create the registry index.ts
-  const registryCode = `import { ModuleRegistry } from 'hono-modules';
+  const registryCode = `import type { Hono } from 'hono';
 
-export const registry = new ModuleRegistry();
-
-registry.register([
-  // Modules will be automatically registered here by the CLI
-]);
+export function registerModules<T extends Hono<any, any, any>>(app: T) {
+  return app;
+}
 `;
 
   const indexPath = path.join(dirPath, 'index.ts');
@@ -51,8 +49,9 @@ registry.register([
   console.log(`Created module registry at ${pc.bold(path.join(response.directory, 'index.ts'))}`);
   console.log(`\nNext steps:`);
   console.log(`1. Import the registry in your main app.ts:`);
-  console.log(pc.dim(`   import { registry } from './${response.directory}';`));
-  console.log(pc.dim(`   registry.applyTo(app);`));
+  console.log(pc.dim(`   import { registerModules } from './${response.directory}';`));
+  console.log(pc.dim(`   const routes = registerModules(app);`));
+  console.log(pc.dim(`   export type AppType = typeof routes;`));
   console.log(`2. Generate your first module:`);
   console.log(pc.dim(`   hm generate module <name>`));
 }

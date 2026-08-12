@@ -1,8 +1,8 @@
 {
-  "name": "hono-modules",
+  "name": "@hono-modules/core",
   "version": "0.1.0",
   "description": "A lightweight module and feature manager for HonoJS applications",
-  "author": "hono-modules authors",
+  "author": "arewageek",
   "license": "MIT",
   "repository": {
     "type": "git",

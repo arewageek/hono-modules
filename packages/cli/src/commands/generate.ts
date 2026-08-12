@@ -4,13 +4,12 @@ import path from 'node:path';
 import { loadConfig } from '../utils/config';
 import { addModuleToRegistry } from '../utils/ast';
 
-const MODULE_TEMPLATE = (name: string) => `import { createModule } from 'hono-modules';
+const MODULE_TEMPLATE = (name: string) => `import { createModule } from '@hono-modules/core';
 import { ${name}Routes } from './routes';
 
 export const ${name}Module = createModule({
   name: '${name}',
   basePath: '/${name}',
-  enabled: true,
   routes: ${name}Routes,
 });
 `;

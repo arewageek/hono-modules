@@ -2,7 +2,7 @@
   "name": "@hono-modules/cli",
   "version": "0.1.0",
   "description": "CLI for hono-modules",
-  "author": "hono-modules authors",
+  "author": "arewageek",
   "license": "MIT",
   "repository": {
     "type": "git",

@@ -1,6 +1,4 @@
 import { Project, SyntaxKind } from 'ts-morph';
-import path from 'node:path';
-import fs from 'node:fs/promises';
 
 export async function addModuleToRegistry(registryPath: string, moduleName: string) {
   const project = new Project();
@@ -22,40 +20,27 @@ export async function addModuleToRegistry(registryPath: string, moduleName: stri
     });
   }
 
-  // 2. Find registry.register([ ... ])
-  const callExpressions = sourceFile.getDescendantsOfKind(SyntaxKind.CallExpression);
-  
-  let registryCallFound = false;
-
-  for (const callExpr of callExpressions) {
-    const expression = callExpr.getExpression();
-    if (expression.getKind() === SyntaxKind.PropertyAccessExpression) {
-      const propAccess = expression.asKindOrThrow(SyntaxKind.PropertyAccessExpression);
-      if (
-        propAccess.getExpression().getText() === 'registry' &&
-        propAccess.getName() === 'register'
-      ) {
-        registryCallFound = true;
-        const args = callExpr.getArguments();
-        const firstArg = args[0];
-        if (firstArg && firstArg.getKind() === SyntaxKind.ArrayLiteralExpression) {
-          const arrayLiteral = firstArg.asKindOrThrow(SyntaxKind.ArrayLiteralExpression);
-          
-          // Check if it's already in the array
-          const elements = arrayLiteral.getElements();
-          const alreadyExists = elements.some((el) => el.getText() === importName);
-          
-          if (!alreadyExists) {
-            arrayLiteral.addElement(importName);
-          }
-        }
-        break;
-      }
-    }
+  // 2. Find registerModules function and its return statement
+  const func = sourceFile.getFunction('registerModules');
+  if (!func) {
+    throw new Error('Could not find registerModules() function in ' + registryPath);
   }
 
-  if (!registryCallFound) {
-    throw new Error('Could not find registry.register([]) call in ' + registryPath);
+  const returnStmt = func.getDescendantsOfKind(SyntaxKind.ReturnStatement)[0];
+  if (!returnStmt) {
+    throw new Error('Could not find return statement in registerModules()');
+  }
+
+  const expression = returnStmt.getExpression();
+  if (!expression) {
+    throw new Error('Return statement has no expression');
+  }
+
+  const text = expression.getText();
+  
+  // Check if it already has this route
+  if (!text.includes(`${importName}.routes`)) {
+    expression.replaceWithText(`${text}\n    .route('/${moduleName}', ${importName}.routes)`);
   }
 
   // Format and save
