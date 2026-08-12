@@ -1,10 +1,10 @@
-import type { Hono } from 'hono';
+import type { Context, Hono } from 'hono';
 import type { ModuleOptions } from './create-module';
 
 export class ModuleRegistry {
   private modules: ModuleOptions[] = [];
 
-  constructor() {}
+  constructor() { }
 
   /**
    * Registers one or more modules.
@@ -24,9 +24,9 @@ export class ModuleRegistry {
 
       if (mod.enabled === false) {
         // Automatically handle requests to disabled modules
-        const disabledResponse = (c: any) => 
+        const disabledResponse = (c: Context) =>
           c.json({ error: `The '${mod.name}' feature is currently disabled.` }, 503);
-          
+
         app.all(`${basePath}/*`, disabledResponse);
         app.all(basePath, disabledResponse);
         continue;

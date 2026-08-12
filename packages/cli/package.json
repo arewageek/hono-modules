@@ -2,12 +2,40 @@
   "name": "@hono-modules/cli",
   "version": "0.1.0",
   "description": "CLI for hono-modules",
+  "author": "hono-modules authors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hono-modules/hono-modules.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/hono-modules/hono-modules",
+  "bugs": {
+    "url": "https://github.com/hono-modules/hono-modules/issues"
+  },
+  "keywords": [
+    "hono",
+    "cli",
+    "modules",
+    "features"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "bin": {
     "hm": "./dist/index.js",
     "hono-modules": "./dist/index.js"
   },
   "scripts": {
-    "build": "bun build ./src/index.ts --outdir ./dist --target node",
+    "build": "bun build ./src/index.ts --outdir ./dist --target node && tsc --emitDeclarationOnly",
     "dev": "bun build ./src/index.ts --outdir ./dist --target node --watch",
     "lint": "eslint .",
     "check-types": "tsc --noEmit"

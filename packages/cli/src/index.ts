@@ -3,6 +3,7 @@ import cac from 'cac';
 import pc from 'picocolors';
 import { initCommand } from './commands/init';
 import { generateModuleCommand } from './commands/generate';
+import pkg from '../package.json';
 
 const cli = cac('hm');
 
@@ -44,7 +45,7 @@ cli
   });
 
 cli.help();
-cli.version('0.1.0');
+cli.version(pkg.version);
 
 try {
   cli.parse();

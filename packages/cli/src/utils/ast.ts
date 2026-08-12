@@ -37,8 +37,9 @@ export async function addModuleToRegistry(registryPath: string, moduleName: stri
       ) {
         registryCallFound = true;
         const args = callExpr.getArguments();
-        if (args.length > 0 && args[0].getKind() === SyntaxKind.ArrayLiteralExpression) {
-          const arrayLiteral = args[0].asKindOrThrow(SyntaxKind.ArrayLiteralExpression);
+        const firstArg = args[0];
+        if (firstArg && firstArg.getKind() === SyntaxKind.ArrayLiteralExpression) {
+          const arrayLiteral = firstArg.asKindOrThrow(SyntaxKind.ArrayLiteralExpression);
           
           // Check if it's already in the array
           const elements = arrayLiteral.getElements();

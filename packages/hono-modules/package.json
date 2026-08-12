@@ -2,10 +2,34 @@
   "name": "hono-modules",
   "version": "0.1.0",
   "description": "A lightweight module and feature manager for HonoJS applications",
+  "author": "hono-modules authors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hono-modules/hono-modules.git"
+  },
+  "homepage": "https://github.com/hono-modules/hono-modules",
+  "bugs": {
+    "url": "https://github.com/hono-modules/hono-modules/issues"
+  },
+  "keywords": [
+    "hono",
+    "modules",
+    "features"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "bun build ./src/index.ts --outdir ./dist --target node",
+    "build": "bun build ./src/index.ts --outdir ./dist --target node && tsc --emitDeclarationOnly",
     "dev": "bun build ./src/index.ts --outdir ./dist --target node --watch",
     "lint": "eslint .",
     "check-types": "tsc --noEmit"
