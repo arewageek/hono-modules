@@ -1,6 +1,6 @@
-import type { Hono } from 'hono';
+import type { Hono, Env } from 'hono';
 
-export interface ModuleOptions<T extends Hono = Hono> {
+export interface ModuleOptions<E extends Env = any, T extends Hono<E, any, any> = Hono<E, any, any>> {
   /**
    * The name of the module.
    */
@@ -28,7 +28,7 @@ export interface ModuleOptions<T extends Hono = Hono> {
 /**
  * Creates a feature module definition.
  */
-export function createModule<T extends Hono>(options: ModuleOptions<T>): ModuleOptions<T> {
+export function createModule<E extends Env = any, T extends Hono<E, any, any> = Hono<E, any, any>>(options: ModuleOptions<E, T>): ModuleOptions<E, T> {
   return {
     ...options,
     enabled: options.enabled ?? true,
