@@ -6,11 +6,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/hono-modules/hono-modules.git"
+    "url": "git+https://github.com/arewageek/hono-modules.git"
   },
-  "homepage": "https://github.com/hono-modules/hono-modules",
+  "homepage": "https://github.com/arewageek/hono-modules",
   "bugs": {
-    "url": "https://github.com/hono-modules/hono-modules/issues"
+    "url": "https://github.com/arewageek/hono-modules/issues"
   },
   "keywords": [
     "hono",
