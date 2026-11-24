@@ -3,6 +3,7 @@ import pc from 'picocolors';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { loadConfig, writeConfig } from '../utils/config';
+import { installSkills, SKILLS_DIR } from '../skills';
 
 export async function initCommand() {
   const existingConfig = await loadConfig();
@@ -13,14 +14,30 @@ export async function initCommand() {
 
   console.log(pc.cyan('Welcome to hono-modules! Let\'s set up your project.\n'));
 
-  const response = await prompts({
-    type: 'text',
-    name: 'directory',
-    message: 'What directory should contain your modules?',
-    initial: 'src/modules',
-  });
+  const response = await prompts([
+    {
+      type: 'text',
+      name: 'directory',
+      message: 'What directory should contain your modules?',
+      initial: 'src/modules',
+      onRender(this: any, kleur) {
+        if (this.placeholder && this.initial) {
+          this.rendered = kleur.cyan(this.initial);
+        }
+      },
+    },
+    {
+      type: 'confirm',
+      name: 'installSkills',
+      message: 'Install AI agent skills into .agents/skills/?',
+      initial: true,
+      onRender(this: any, kleur) {
+        this.yesOption = kleur.cyan('(Y/n)');
+      },
+    },
+  ]);
 
-  if (!response.directory) {
+  if (!response.directory || response.installSkills === undefined) {
     console.log(pc.red('Initialization cancelled.'));
     return;
   }
@@ -44,9 +61,20 @@ export function registerModules<T extends Hono<any, any, any>>(app: T) {
   // Create config
   await writeConfig({ directory: response.directory });
 
+  let installedSkills: string[] = [];
+  if (response.installSkills) {
+    installedSkills = await installSkills(process.cwd());
+  }
+
   console.log(pc.green(`\n✔ Successfully initialized hono-modules!`));
   console.log(`Created configuration in ${pc.bold('hm.config.json')}`);
   console.log(`Created module registry at ${pc.bold(path.join(response.directory, 'index.ts'))}`);
+  if (installedSkills.length > 0) {
+    console.log(`Installed ${installedSkills.length} AI agent skills in ${pc.bold(SKILLS_DIR)}`);
+    for (const skillPath of installedSkills) {
+      console.log(pc.dim(`  - ${skillPath}`));
+    }
+  }
   console.log(`\nNext steps:`);
   console.log(`1. Import the registry in your main app.ts:`);
   console.log(pc.dim(`   import { registerModules } from './${response.directory}';`));
