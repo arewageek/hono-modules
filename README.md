@@ -55,11 +55,17 @@ src/
 
 ### 1. Initialization
 
-Initialize the library in your project root. The CLI will prompt you to define your preferred directory name (e.g., `src/modules` or `src/features`) and will generate a configuration file (`hm.config.json`) alongside the central registry.
+Initialize the library in your project root. The CLI will prompt you to define your preferred directory name (e.g., `src/modules` or `src/features`), ask whether you want to install AI agent skills into `.agents/skills/`, and generate `hm.config.json` alongside the central registry.
 
 ```bash
 npx hm init
 ```
+
+When you choose to install AI agent skills, `hm init` adds three standalone skills into `.agents/skills/` (the cross-agent open standard):
+
+- `.agents/skills/hono-modules-architecture/SKILL.md` — Core architecture, `createModule` API, directory rules, and feature toggles.
+- `.agents/skills/hono-modules-workflow/SKILL.md` — Step-by-step procedures for scaffolding, implementing, extending, and toggling modules.
+- `.agents/skills/hono-modules-rpc/SKILL.md` — End-to-end Hono RPC inference (`hc<AppType>`) and typed `Env` bindings.
 
 ### 2. Generate a Module
 
